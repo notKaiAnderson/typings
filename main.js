@@ -16,6 +16,7 @@ let startDate = 0;
 let timer;
 let timerActive = false;
 let punctuation = false;
+let quotes = [];
 
 // Get cookies
 getCookie('theme') === '' ? setTheme('light') : setTheme(getCookie('theme'));
@@ -43,6 +44,15 @@ function setText(e) {
   inputField.className = '';
 
   switch (typingMode) {
+    case 'quote':
+      textDisplay.style.height = 'auto';
+      textDisplay.innerHTML = '';
+      if (!keepWordList) {
+        wordList = [];
+      }
+      wordList = quotes[Math.floor(Math.random() * quotes.length)].text.split(' ');
+      break;
+
     case 'wordcount':
       textDisplay.style.height = 'auto';
       textDisplay.innerHTML = '';
@@ -108,6 +118,7 @@ function addPunctuations() {
 
 // Display text to textDisplay
 function showText() {
+
   wordList.forEach(word => {
     let span = document.createElement('span');
     span.innerHTML = word + ' ';
@@ -317,6 +328,13 @@ function setLanguage(_lang) {
 function setTypingMode(_mode) {
   const mode = _mode.toLowerCase();
   switch (mode) {
+    case 'quote':
+      typingMode = mode;
+      setCookie('quoteMode', mode, 90);
+      document.querySelector('#word-count').style.display = 'inline';
+      document.querySelector('#time-count').style.display = 'none';
+      setText();
+      break;
     case 'wordcount':
       typingMode = mode;
       setCookie('typingMode', mode, 90);
@@ -456,4 +474,22 @@ function hideThemeCenter() {
   document.getElementById('command-center').classList.remove('hidden');
 }
 
-
+// fetch quotes
+function fetchQuotes() {
+  fetch(`texts/quotes/english.json`)
+  .then(response => {
+    if (response.status === 200) {
+      response
+        .json()
+        .then(fetchedQuotes => {
+          console.log(quotes)
+          fetchedQuotes.forEach(quote => quotes.push(quote));
+        })
+        .catch(err => console.error(err));
+    } else {
+      console.log(`theme ${theme} is undefine`);
+    }
+  })
+  .catch(err => console.error(err));
+}
+fetchQuotes();
