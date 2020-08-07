@@ -3,20 +3,19 @@ const textDisplay = document.querySelector('#text-display');
 const inputField = document.querySelector('#input-field');
 
 // Initialize typing mode variables
-let typingMode = 'wordcount';
-let wordCount;
-let timeCount;
-
-// Initialize dynamic variables
-let randomWords = [];
-let wordList = [];
-let currentWord = 0;
-let correctKeys = 0;
-let startDate = 0;
-let timer;
-let timerActive = false;
-let punctuation = false;
-let quotes = [];
+let typingMode = 'wordcount',
+    wordCount,
+    timeCount,
+    // Initialize dynamic variables
+    randomWords = [],
+    wordList = [],
+    currentWord = 0,
+    correctKeys = 0,
+    startDate = 0,
+    timer,
+    timerActive = false,
+    punctuation = false,
+    quotes = [];
 
 // Get cookies
 getCookie('theme') === '' ? setTheme('light') : setTheme(getCookie('theme'));
@@ -118,7 +117,7 @@ function addPunctuations() {
 
 // Display text to textDisplay
 function showText() {
-
+  
   wordList.forEach(word => {
     let span = document.createElement('span');
     span.innerHTML = word + ' ';
@@ -154,9 +153,10 @@ inputField.addEventListener('keydown', e => {
   if (currentWord === 0 && inputField.value === '') {
     switch (typingMode) {
       case 'wordcount':
+      case 'quote':
         startDate = Date.now();
         break;
-
+      
       case 'time':
         if (!timerActive) {
           startTimer(timeCount);
@@ -228,6 +228,7 @@ function showResult() {
   let words, minute, acc;
   switch (typingMode) {
     case 'wordcount':
+    case 'quote':
       words = correctKeys / 5;
       minute = (Date.now() - startDate) / 1000 / 60;
       let totalKeys = -1;
@@ -316,13 +317,30 @@ function setLanguage(_lang) {
             textDisplay.style.direction = "ltr"
             inputField.style.direction = "ltr"
         }
-
         setText();
       } else {
         console.error(`language ${lang} is undefine`);
       }
     })
     .catch(err => console.error(err));
+
+  fetch(`texts/quotes/${_lang}.json`)
+    .then(response => {
+      if (response.status === 200) {
+        response
+          .json()
+          .then(fetchedQuotes => {
+            quotes = []
+            fetchedQuotes.forEach(quote => quotes.push(quote));
+          })
+          .catch(err => console.error(err));
+          setText();  
+      } else {
+        console.log(`theme ${theme} is undefine`);
+      }
+    })
+    .catch(err => console.error(err)); 
+  
 }
 
 function setTypingMode(_mode) {
@@ -452,7 +470,7 @@ function showAllThemes(){
       } else {
         console.log(`Cant find theme-list.json`);
       }
-    })
+    })  
     .catch(err => console.error(err));
 }
 
@@ -473,23 +491,3 @@ function hideThemeCenter() {
   document.getElementById('theme-center').classList.add('hidden');
   document.getElementById('command-center').classList.remove('hidden');
 }
-
-// fetch quotes
-function fetchQuotes() {
-  fetch(`texts/quotes/english.json`)
-  .then(response => {
-    if (response.status === 200) {
-      response
-        .json()
-        .then(fetchedQuotes => {
-          console.log(quotes)
-          fetchedQuotes.forEach(quote => quotes.push(quote));
-        })
-        .catch(err => console.error(err));
-    } else {
-      console.log(`theme ${theme} is undefine`);
-    }
-  })
-  .catch(err => console.error(err));
-}
-fetchQuotes();
