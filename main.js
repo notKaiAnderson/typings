@@ -49,7 +49,10 @@ function setText(e) {
       if (!keepWordList) {
         wordList = [];
       }
-      wordList = quotes[Math.floor(Math.random() * quotes.length)].text.split(' ');
+      const quoteEle = document.querySelector('#quote-title')
+      let quote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteEle.innerHTML = quote.author;
+      wordList = quote.text.split(' ');
       break;
 
     case 'wordcount':
@@ -349,14 +352,16 @@ function setTypingMode(_mode) {
     case 'quote':
       typingMode = mode;
       setCookie('quoteMode', mode, 90);
-      document.querySelector('#word-count').style.display = 'inline';
+      document.querySelector('#word-count').style.display = 'none';
       document.querySelector('#time-count').style.display = 'none';
+      document.querySelector('#quote-title').style.display = 'inline';
       setText();
       break;
     case 'wordcount':
       typingMode = mode;
       setCookie('typingMode', mode, 90);
       document.querySelector('#word-count').style.display = 'inline';
+      document.querySelector('#quote-title').style.display = 'none';
       document.querySelector('#time-count').style.display = 'none';
       setText();
       break;
@@ -364,6 +369,7 @@ function setTypingMode(_mode) {
       typingMode = mode;
       setCookie('typingMode', mode, 90);
       document.querySelector('#word-count').style.display = 'none';
+      document.querySelector('#quote-title').style.display = 'none';
       document.querySelector('#time-count').style.display = 'inline';
       setText();
       break;
